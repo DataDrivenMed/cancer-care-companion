@@ -1,0 +1,75 @@
+name: release-claude-skills
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "skills/cancer-care-companion/**"
+      - "skills/cancer-care-companion-patient/**"
+      - "skills/cancer-care-companion-power/**"
+      - "schemas/**"
+      - "templates/**"
+      - "DISCLAIMER.md"
+      - "QUICKSTART.md"
+      - "CLAUDE-SKILL-INSTALL.md"
+      - "scripts/package_claude_skill.py"
+      - ".github/workflows/release-claude-skills.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build Claude Skill ZIPs
+        run: python3 scripts/package_claude_skill.py
+
+      - name: Verify packages
+        run: |
+          test -s dist/cancer-care-companion-claude-skill.zip
+          test -s dist/cancer-care-companion-patient-claude-skill.zip
+          test -s dist/cancer-care-companion-power-claude-skill.zip
+          unzip -t dist/cancer-care-companion-claude-skill.zip
+          unzip -t dist/cancer-care-companion-patient-claude-skill.zip
+          unzip -t dist/cancer-care-companion-power-claude-skill.zip
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          SHORT_SHA="${GITHUB_SHA::7}"
+          TAG="claude-skills-${GITHUB_RUN_NUMBER}-${SHORT_SHA}"
+          TITLE="Cancer Care Companion Claude Skills ${SHORT_SHA}"
+          cat > /tmp/release-notes.md <<'EOF'
+          Upload-ready Claude Skill packages for claude.ai.
+
+          ### Choose an edition
+
+          - **Standard**: `cancer-care-companion-claude-skill.zip`  
+            Recommended for most users. Full longitudinal cancer navigation with concise patient-facing outputs.
+
+          - **Patient**: `cancer-care-companion-patient-claude-skill.zip`  
+            Lighter version focused on next steps, appointments, symptoms, treatment questions, and practical support.
+
+          - **Power User**: `cancer-care-companion-power-claude-skill.zip`  
+            Advanced version with deeper longitudinal state, provenance, biomarkers, treatment timelines, trial screening, decision maps, and evidence-grounded research.
+
+          Upload a ZIP directly in Claude under **Customize → Skills → + → Create skill → Upload a skill**.
+          EOF
+
+          gh release create "$TAG" \
+            dist/cancer-care-companion-claude-skill.zip \
+            dist/cancer-care-companion-patient-claude-skill.zip \
+            dist/cancer-care-companion-power-claude-skill.zip \
+            --target "$GITHUB_SHA" \
+            --title "$TITLE" \
+            --notes-file /tmp/release-notes.md \
+            --latest

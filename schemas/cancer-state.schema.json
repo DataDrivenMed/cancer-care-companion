@@ -1,0 +1,267 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://datadrivenmed.github.io/cancer-care-companion/schemas/cancer-state.schema.json",
+  "title": "Cancer Care Companion Longitudinal State",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "case_id": {"type": "string"},
+    "updated_at": {"type": "string"},
+    "patient_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "preferred_label": {"type": "string"},
+        "age": {"type": ["integer", "null"], "minimum": 0},
+        "country": {"type": ["string", "null"]},
+        "region": {"type": ["string", "null"]},
+        "care_centers": {"type": "array", "items": {"type": "string"}},
+        "care_team": {"type": "array", "items": {"$ref": "#/$defs/contact"}},
+        "caregivers": {"type": "array", "items": {"$ref": "#/$defs/contact"}},
+        "goals": {"type": "array", "items": {"type": "string"}},
+        "communication_preferences": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "disease": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["status"],
+        "properties": {
+          "primary_site": {"type": ["string", "null"]},
+          "histology": {"type": ["string", "null"]},
+          "diagnosis_date": {"type": ["string", "null"]},
+          "staging_system": {"type": ["string", "null"]},
+          "stage": {"type": ["string", "null"]},
+          "stage_basis": {"type": ["string", "null"]},
+          "disease_sites": {"type": "array", "items": {"type": "string"}},
+          "resectability": {"type": ["string", "null"]},
+          "recurrence_or_progression": {"type": ["string", "null"]},
+          "performance_status": {"type": ["string", "null"]},
+          "status": {"$ref": "#/$defs/fact_status"},
+          "source": {"$ref": "#/$defs/source"}
+        }
+      }
+    },
+    "pathology": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "date": {"type": ["string", "null"]},
+          "specimen": {"type": ["string", "null"]},
+          "procedure": {"type": ["string", "null"]},
+          "histology": {"type": ["string", "null"]},
+          "grade": {"type": ["string", "null"]},
+          "margins": {"type": ["string", "null"]},
+          "nodes": {"type": ["string", "null"]},
+          "other_findings": {"type": "array", "items": {"type": "string"}},
+          "status": {"$ref": "#/$defs/fact_status"},
+          "source": {"$ref": "#/$defs/source"}
+        }
+      }
+    },
+    "biomarkers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "status"],
+        "properties": {
+          "name": {"type": "string"},
+          "result": {"type": ["string", "null"]},
+          "category": {"enum": ["somatic", "germline", "ihc", "cytogenetic", "liquid_biopsy", "other"]},
+          "assay": {"type": ["string", "null"]},
+          "specimen": {"type": ["string", "null"]},
+          "collection_date": {"type": ["string", "null"]},
+          "report_date": {"type": ["string", "null"]},
+          "clinical_relevance": {"type": "array", "items": {"enum": ["diagnostic", "prognostic", "predictive", "hereditary", "uncertain"]}},
+          "status": {"$ref": "#/$defs/fact_status"},
+          "source": {"$ref": "#/$defs/source"}
+        }
+      }
+    },
+    "treatments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["modality", "status"],
+        "properties": {
+          "modality": {"enum": ["surgery", "radiation", "systemic", "cellular_therapy", "transplant", "supportive", "other"]},
+          "name": {"type": ["string", "null"]},
+          "start_date": {"type": ["string", "null"]},
+          "end_date": {"type": ["string", "null"]},
+          "line_of_therapy": {"type": ["string", "null"]},
+          "intent": {"type": ["string", "null"]},
+          "dose_or_schedule": {"type": ["string", "null"]},
+          "status": {"enum": ["planned", "current", "held", "completed", "stopped", "historical", "uncertain"]},
+          "reason_for_change": {"type": ["string", "null"]},
+          "response": {"type": ["string", "null"]},
+          "toxicities": {"type": "array", "items": {"type": "string"}},
+          "source": {"$ref": "#/$defs/source"}
+        }
+      }
+    },
+    "response_assessments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "date": {"type": ["string", "null"]},
+          "modality": {"type": ["string", "null"]},
+          "assessment": {"type": ["string", "null"]},
+          "status": {"$ref": "#/$defs/fact_status"},
+          "source": {"$ref": "#/$defs/source"}
+        }
+      }
+    },
+    "symptoms": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {"type": "string"},
+          "onset": {"type": ["string", "null"]},
+          "severity": {"type": ["string", "null"]},
+          "trend": {"type": ["string", "null"]},
+          "associated_features": {"type": "array", "items": {"type": "string"}},
+          "care_team_instruction": {"type": ["string", "null"]},
+          "status": {"$ref": "#/$defs/fact_status"},
+          "source": {"$ref": "#/$defs/source"}
+        }
+      }
+    },
+    "pending_items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "item": {"type": "string"},
+          "expected_date": {"type": ["string", "null"]},
+          "why_it_matters": {"type": ["string", "null"]},
+          "source": {"$ref": "#/$defs/source"}
+        }
+      }
+    },
+    "decision_points": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "date": {"type": ["string", "null"]},
+          "question": {"type": "string"},
+          "options": {"type": "array", "items": {"type": "string"}},
+          "unknowns": {"type": "array", "items": {"type": "string"}},
+          "status": {"enum": ["active", "resolved", "historical"]},
+          "source": {"$ref": "#/$defs/source"}
+        }
+      }
+    },
+    "appointments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "date": {"type": ["string", "null"]},
+          "specialty": {"type": ["string", "null"]},
+          "clinician_or_center": {"type": ["string", "null"]},
+          "purpose": {"type": ["string", "null"]},
+          "questions": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    "trial_candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "trial_id": {"type": "string"},
+          "title": {"type": ["string", "null"]},
+          "phase": {"type": ["string", "null"]},
+          "site": {"type": ["string", "null"]},
+          "site_status": {"type": ["string", "null"]},
+          "why_it_may_fit": {"type": ["string", "null"]},
+          "mismatches_or_unknowns": {"type": "array", "items": {"type": "string"}},
+          "burdens": {"type": "array", "items": {"type": "string"}},
+          "last_checked": {"type": ["string", "null"]}
+        }
+      }
+    },
+    "practical_barriers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "category": {"enum": ["insurance", "financial", "transportation", "lodging", "work", "caregiving", "language", "nutrition", "rehabilitation", "fertility", "other"]},
+          "description": {"type": "string"},
+          "status": {"enum": ["open", "in_progress", "resolved"]},
+          "next_action": {"type": ["string", "null"]}
+        }
+      }
+    },
+    "documents": {"type": "array", "items": {"$ref": "#/$defs/source"}},
+    "conflicts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "topic": {"type": "string"},
+          "description": {"type": "string"},
+          "sources": {"type": "array", "items": {"$ref": "#/$defs/source"}},
+          "resolution_status": {"enum": ["open", "clarified", "resolved"]}
+        }
+      }
+    },
+    "care_log": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "date": {"type": ["string", "null"]},
+          "event": {"type": "string"},
+          "source": {"$ref": "#/$defs/source"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "fact_status": {
+      "enum": ["confirmed", "reported", "pending", "uncertain", "historical", "not_documented"]
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source_id": {"type": ["string", "null"]},
+        "document_type": {"type": ["string", "null"]},
+        "title": {"type": ["string", "null"]},
+        "date": {"type": ["string", "null"]},
+        "author_or_center": {"type": ["string", "null"]},
+        "location": {"type": ["string", "null"]}
+      }
+    },
+    "contact": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {"type": ["string", "null"]},
+        "role": {"type": ["string", "null"]},
+        "organization": {"type": ["string", "null"]},
+        "phone": {"type": ["string", "null"]},
+        "email": {"type": ["string", "null"]}
+      }
+    }
+  }
+}

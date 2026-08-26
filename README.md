@@ -1,57 +1,155 @@
 # Cancer Care Companion
 
-> **A downstream AI companion skill for cancer patients and caregivers.** 
-> Built to work alongside open-source care navigation tools like [Peter Yang's /fuck-cancer](https://github.com/petergyang/fuck-cancer).
+> A longitudinal, evidence-grounded cancer navigation skill for patients and caregivers.
 
-## 🤔 What is this?
-Tools like `/fuck-cancer` are incredible at gathering medical intelligence, finding clinical trials, and building a master "War Room" brief. 
+Cancer Care Companion builds on the concise patient-advocacy brief concept in [Peter Yang's `/fuck-cancer`](https://github.com/petergyang/fuck-cancer) and expands it into a modular cancer-navigation system.
 
-**The Cancer Care Companion** takes that data a step further. It translates complex medical briefs into daily survival guides, triages emergency symptoms, drafts insurance appeal letters, and handles clinical trial travel logistics.
+The design goal is simple: **keep the patient-facing output short while making the intelligence behind it much deeper.**
 
----
+## The two-layer model
 
-## ⚡ The Unified Command System
-This skill uses a single command label: **`/cancer-care`**. 
-Simply type the command followed by your category and context in your LLM.
+### 1. Patient-facing layer
+A short living brief that answers:
 
-| Command | What it does | Example |
-| :--- | :--- | :--- |
-| `/cancer-care split` | Splits a medical brief into a **Patient View** (daily life, empathy) and a **Caregiver View** (logistics, billing, trials). | `/cancer-care split [paste your brief here]` |
-| `/cancer-care triage` | Instantly checks symptoms against oncology "Red Flags" (e.g., neutropenic fever) and tells you if you need the ER. | `/cancer-care triage My dad has a 101.2 fever and chills` |
-| `/cancer-care appeal` | Drafts a formal insurance appeal letter for denied treatments or scans, citing standard-of-care guidelines. | `/cancer-care appeal Insurance denied the PET scan` |
-| `/cancer-care trials` | Provides travel logistics, lodging resources (Joe's House, Angel Flight), and insurance questions for out-of-state clinical trials. | `/cancer-care trials Trial is at MD Anderson, we live in Ohio` |
-| `/cancer-care explain` | Translates complex lab values into plain English and explains how they affect daily life (e.g., diet, safety). | `/cancer-care explain Absolute Neutrophil Count` |
+1. What should we do next?
+2. What do we know?
+3. What is still uncertain?
+4. What should we ask at the next appointment?
 
----
+### 2. Intelligence layer
+A structured longitudinal record that tracks diagnosis, staging, pathology, biomarkers, treatment, response, symptoms, evidence, trials, practical barriers, documents, and unresolved decision points.
 
-## 🚀 How to Install This Skill
+The brief is the front door. The structured cancer state is the engine behind it.
 
-### 🟠 In Claude (Projects)
-1. Go to [Claude.ai](https://claude.ai) and create a new **Project**.
-2. Open **Project Instructions**.
-3. Copy and paste the contents of [`claude-instructions.md`](./claude-instructions.md) into the box.
-4. *(Optional but recommended)* Upload oncology triage guidelines to the Project Knowledge.
+## Core capabilities
 
-### 🟢 In ChatGPT (Custom GPTs)
-1. Go to **My GPTs** -> **Create a GPT**.
-2. Name it **Cancer Care Companion**.
-3. Paste the contents of [`chatgpt-gpt-setup.md`](./chatgpt-gpt-setup.md) into the **Instructions** box.
-4. Add the conversation starters provided in the file.
+| Module | Purpose |
+| --- | --- |
+| Living Brief | Three immediate priorities, confirmed facts, terminology, compact care log |
+| Cancer State | Longitudinal source of truth with current and historical disease facts |
+| Diagnostic Navigator | Separates confirmed diagnosis, staging, pending workup, and meaningful gaps |
+| Biomarker Intelligence | Organizes tumor, molecular, IHC, liquid-biopsy, and germline findings with provenance |
+| Treatment Timeline | Tracks surgery, radiation, systemic therapy, cellular therapy, supportive care, response, and reasons for change |
+| Decision Map | Shows the current decision node, realistic options to discuss, evidence, tradeoffs, and unknowns |
+| Evidence Navigator | Grounds claims in official agencies, regulators, professional guidance, and primary literature |
+| Trial Navigator | Finds candidate trials, checks site-level recruitment, and screens obvious eligibility mismatches without claiming eligibility |
+| Second Opinions | Matches the clinical question to pathology, surgery, radiation, medical oncology, molecular tumor board, genetics, or trial review |
+| Appointment Packet | Summarizes what changed, what is pending, and up to five high-value questions |
+| Symptom Support | Organizes symptoms and uses care-team instructions plus context-aware escalation rather than universal hard-coded rules |
+| Practical Navigation | Organizes insurance, travel, lodging, work, disability, financial support, rehabilitation, nutrition, fertility, and caregiver logistics |
+| Survivorship | Transitions the same longitudinal record into surveillance and late-effect tracking when appropriate |
+| Document Intelligence | Keeps extracted facts traceable to pathology, imaging, notes, molecular reports, labs, and other supplied records |
 
-### 🔵 In Gemini (Gems)
-1. Go to [gemini.google.com](https://gemini.google.com) and click **Gem manager**.
-2. Click **Create new Gem**.
-3. Paste the contents of [`gemini-gem-setup.md`](./gemini-gem-setup.md) into the instructions.
+## Unified command
 
----
+Use `/cancer-care` with natural language. Subcommands are optional convenience shortcuts rather than separate products.
 
-## ⚠️ Medical & Privacy Disclaimer
-This tool is an AI assistant, **NOT a doctor**. It does not diagnose or prescribe. Always verify medical decisions with your oncology care team. 
+```text
+/cancer-care Update our living brief with this pathology report.
+/cancer-care appointment Prepare us for Friday's oncology visit.
+/cancer-care decision Compare the options the oncologist discussed.
+/cancer-care biomarkers Explain these molecular results and what they may affect.
+/cancer-care trials Find candidate trials within 150 miles.
+/cancer-care second-opinion What type of second opinion would be most useful now?
+/cancer-care symptoms She has a new fever and chills after treatment. What should we do?
+/cancer-care appeal Help organize an appeal for this denial.
+/cancer-care caregiver Create a handoff for my brother who is covering this week.
+```
 
-**HIPAA Warning:** Never upload real names, dates of birth, or exact addresses to public AI tools. Always anonymize data (e.g., use "Patient X", "Age 65", "City A").
+## Output modes
 
----
+The same underlying record can generate:
 
-## 🙏 Credits
-*   Inspired by and designed to complement [Peter Yang's /fuck-cancer](https://github.com/petergyang/fuck-cancer) open-source skill.
-*   Built for the caregiver community.
+- **Living Brief**: shortest patient/caregiver summary
+- **Appointment Packet**: visit preparation and questions
+- **Decision Map**: options, evidence, tradeoffs, and unknowns
+- **Trial Shortlist**: three to five candidate studies with site status
+- **Second-Opinion Packet**: concise case summary plus exact review question
+- **Treatment Timeline**: chronological therapy, response, and toxicity history
+- **Biomarker Summary**: molecular findings with specimen, assay, date, and provenance
+- **Caregiver Handoff**: immediate logistics and watch items
+
+## Structured cancer state
+
+The included JSON schema supports:
+
+- cancer type and histology
+- staging system, stage, and basis
+- disease sites
+- pathology
+- biomarkers and molecular alterations
+- germline results
+- treatments and line/intent when documented
+- response assessments
+- symptoms and adverse effects
+- pending studies
+- decision points
+- appointments
+- clinical-trial candidates
+- practical barriers
+- source-document provenance
+- contradictions and unresolved conflicts
+
+A newer result never silently erases an older one. Conflicting records are surfaced for clarification.
+
+## Evidence hierarchy
+
+For current medical research, prefer:
+
+1. national cancer agencies and official government sources
+2. national regulators for approvals and labels
+3. current official professional guidance when directly applicable
+4. peer-reviewed primary evidence for unresolved or emerging questions
+5. academic cancer-center pages for their own programs and trials
+6. curated variant resources only as supplemental evidence
+
+Do not present search snippets, SEO pages, social posts, or AI summaries as medical evidence.
+
+## Symptom escalation
+
+The companion does **not** use one universal oncology triage table for every patient. Escalation should consider:
+
+- the oncology team's written instructions
+- treatment type and timing
+- immune suppression or other documented risk factors
+- measured vital signs when available
+- severity, duration, and progression
+- inability to hydrate or take essential medication
+- neurologic, respiratory, bleeding, or other emergency features
+
+When the safest action is urgent evaluation, that action is placed first and research does not delay it.
+
+## Privacy
+
+Use the privacy rules of the environment in which the skill is running. Do not place names, medical record numbers, dates of birth, exact addresses, or other direct identifiers into public web searches or trial-search queries.
+
+For consumer AI services, users should review the service's data controls and their organization's policies before entering protected or confidential health information. Do not make blanket claims that every AI service is or is not HIPAA compliant.
+
+## Repository layout
+
+```text
+skills/cancer-care-companion/
+  SKILL.md
+  eval.md
+schemas/
+  cancer-state.schema.json
+templates/
+  living-brief.md
+  appointment-packet.md
+  decision-map.md
+claude-instructions.md
+DISCLAIMER.md
+LICENSE
+```
+
+## Status
+
+`comprehensive-v2` is the expanded architecture. Initial implementation focuses on the longitudinal state model, safer symptom handling, patient/caregiver views, decision support, evidence provenance, and reusable output templates.
+
+## Attribution
+
+This project is inspired by and builds on concepts from [`petergyang/fuck-cancer`](https://github.com/petergyang/fuck-cancer), Copyright (c) 2026 Peter Yang, licensed under the MIT License.
+
+## License
+
+MIT. See `LICENSE`.

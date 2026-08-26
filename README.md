@@ -6,6 +6,24 @@ Cancer Care Companion builds on the concise patient-advocacy brief concept in [P
 
 The design goal is simple: **keep the patient-facing output short while making the intelligence behind it much deeper.**
 
+## Download a Claude Skill ZIP
+
+No Python, Git, terminal, or build step is required. Download one ZIP and upload it directly to Claude under **Customize → Skills → + → Create skill → Upload a skill**.
+
+### [Download Cancer Care Companion Standard](https://github.com/DataDrivenMed/cancer-care-companion/releases/latest/download/cancer-care-companion-claude-skill.zip)
+
+**Recommended for most users.** Full longitudinal cancer navigation with concise patient-facing outputs, appointments, decisions, biomarkers, trials, symptoms, practical support, and survivorship.
+
+### [Download Cancer Care Companion Patient](https://github.com/DataDrivenMed/cancer-care-companion/releases/latest/download/cancer-care-companion-patient-claude-skill.zip)
+
+**Simpler patient and caregiver edition.** Focuses on the three things that matter now, appointments, symptoms, treatment questions, second opinions, insurance, and practical support with less technical structure.
+
+### [Download Cancer Care Companion Power User](https://github.com/DataDrivenMed/cancer-care-companion/releases/latest/download/cancer-care-companion-power-claude-skill.zip)
+
+**Advanced edition.** Adds deeper longitudinal state management, source provenance, biomarker intelligence, treatment timelines, ClinicalTrials.gov screening, decision maps, evidence hierarchy, and advanced uncertainty handling.
+
+[View all releases](https://github.com/DataDrivenMed/cancer-care-companion/releases)
+
 ## Start here
 
 You can use Cancer Care Companion in four ways.
@@ -27,7 +45,21 @@ For a nontechnical walkthrough, see [`QUICKSTART.md`](./QUICKSTART.md).
 
 This is the preferred route when you want Cancer Care Companion available as a reusable Skill inside Claude chat rather than only inside one Project.
 
-Build the uploadable package:
+For ordinary Claude users, use one of the direct release downloads above. You do not need to build anything yourself.
+
+Then in Claude:
+
+1. Open **Customize**.
+2. Open **Skills**.
+3. Click **+**.
+4. Choose **Create skill**.
+5. Choose **Upload a skill**.
+6. Upload the ZIP you downloaded.
+7. Enable the Skill.
+
+Full web, iPhone/iPad, Android, Cowork, and developer instructions: [`CLAUDE-SKILL-INSTALL.md`](./CLAUDE-SKILL-INSTALL.md)
+
+For maintainers or developers, the repository can rebuild all three uploadable ZIPs with:
 
 ```bash
 python3 scripts/package_claude_skill.py
@@ -37,19 +69,9 @@ This creates:
 
 ```text
 dist/cancer-care-companion-claude-skill.zip
+dist/cancer-care-companion-patient-claude-skill.zip
+dist/cancer-care-companion-power-claude-skill.zip
 ```
-
-Then in Claude:
-
-1. Open **Customize**.
-2. Open **Skills**.
-3. Click **+**.
-4. Choose **Create skill**.
-5. Choose **Upload a skill**.
-6. Upload `cancer-care-companion-claude-skill.zip`.
-7. Enable the Skill.
-
-Full instructions: [`CLAUDE-SKILL-INSTALL.md`](./CLAUDE-SKILL-INSTALL.md)
 
 For Claude Code or other compatible developer environments, the Agent Skills CLI also remains available:
 
@@ -75,7 +97,7 @@ The repository includes a complete ChatGPT Custom GPT setup:
 
 [`chatgpt-gpt-setup.md`](./chatgpt-gpt-setup.md)
 
-The GPT configuration is split correctly into separate layers:
+The GPT configuration is split into separate layers:
 
 ```text
 chatgpt/
@@ -91,7 +113,7 @@ chatgpt/
 
 The setup guide also includes the GPT name, description, conversation starters, recommended capabilities, testing scenarios, and privacy boundaries.
 
-**Current availability note:** OpenAI currently limits creation of new Custom GPTs to eligible Business, Enterprise, and Edu workspaces, subject to workspace permissions. If the GPT builder is unavailable, the same instructions can be used in a ChatGPT Project.
+**Availability note:** ChatGPT controls who can create new Custom GPTs based on workspace type and permissions. If the GPT builder is unavailable, the same instructions can be used in a ChatGPT Project.
 
 ## Option 4: Use with ChatGPT Work
 
@@ -293,13 +315,16 @@ Do not put a real patient's private case record into reusable shared GPT Knowled
 # Repository layout
 
 ```text
-skills/cancer-care-companion/
-  SKILL.md
-  eval.md
-  agents/
-    openai.yaml
-  scripts/
-    search_trials.py
+skills/
+  cancer-care-companion/
+    SKILL.md
+    eval.md
+    agents/openai.yaml
+    scripts/search_trials.py
+  cancer-care-companion-patient/
+    SKILL.md
+  cancer-care-companion-power/
+    SKILL.md
 
 schemas/
   cancer-state.schema.json
@@ -312,8 +337,7 @@ templates/
 chatgpt/
   INSTRUCTIONS.md
   KNOWLEDGE_MANIFEST.md
-  actions/
-    clinicaltrials-openapi.yaml
+  actions/clinicaltrials-openapi.yaml
 
 scripts/
   package_claude_skill.py
@@ -321,6 +345,7 @@ scripts/
 .github/workflows/
   test.yml
   package-claude-skill.yml
+  release-claude-skills.yml
 
 CLAUDE-SKILL-INSTALL.md
 claude-instructions.md

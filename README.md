@@ -8,96 +8,98 @@ The design goal is simple: **keep the patient-facing output short while making t
 
 ## Start here
 
-You do not need to understand the architecture before using Cancer Care Companion.
+You can use Cancer Care Companion in four ways.
 
-The basic workflow is:
+| Setup | Best for | Instructions |
+| --- | --- | --- |
+| **Claude Skill** | Installing Cancer Care Companion as a reusable custom Skill in Claude | [`CLAUDE-SKILL-INSTALL.md`](./CLAUDE-SKILL-INSTALL.md) |
+| **Claude Project** | Keeping one patient's files, context, and instructions together in a persistent Claude Project | [`claude-instructions.md`](./claude-instructions.md) |
+| **ChatGPT Custom GPT** | Creating a dedicated Cancer Care Companion GPT with Instructions, Knowledge, capabilities, and conversation starters | [`chatgpt-gpt-setup.md`](./chatgpt-gpt-setup.md) |
+| **ChatGPT Work** | Creating and updating editable cancer-care artifacts from reports and case files | [`chatgpt-work-instructions.md`](./chatgpt-work-instructions.md) |
 
-1. **Choose how you want to use Cancer Care Companion.** Install it as a Claude Skill, put it in a Claude Project, configure it as a Custom GPT in ChatGPT, or use the dedicated ChatGPT Work instructions.
-2. **Start with whatever information you have.** A diagnosis, brain dump, pathology report, imaging report, molecular report, treatment summary, or existing cancer brief is enough.
-3. **Build one living cancer record.**
-4. **Keep updating the same case whenever something changes.**
-5. **Generate the view you need now.** Living Brief, Appointment Packet, Decision Map, Biomarker Summary, Treatment Timeline, Trial Shortlist, Second-Opinion Packet, Caregiver Handoff, or survivorship update.
+You can combine these. For example, enable the reusable **Claude Skill** and keep one patient's records inside a dedicated **Claude Project**.
 
 For a nontechnical walkthrough, see [`QUICKSTART.md`](./QUICKSTART.md).
 
 # Choose your setup
 
-Cancer Care Companion can be used in four main ways.
+## Option 1: Install as a custom Claude Skill
 
-| Setup | Best for | Instructions |
-| --- | --- | --- |
-| **Claude Skill** | Installing Cancer Care Companion as a reusable skill available across supported Claude workflows | [`CLAUDE-SKILL-INSTALL.md`](./CLAUDE-SKILL-INSTALL.md) |
-| **Claude Project** | Keeping one patient's files, context, and instructions together inside a persistent Claude Project | [`claude-instructions.md`](./claude-instructions.md) |
-| **ChatGPT Custom GPT** | Creating a dedicated Cancer Care Companion GPT with instructions, knowledge files, capabilities, and conversation starters | [`chatgpt-gpt-setup.md`](./chatgpt-gpt-setup.md) |
-| **ChatGPT Work** | Creating and updating editable cancer-care artifacts from reports and existing case files | [`chatgpt-work-instructions.md`](./chatgpt-work-instructions.md) |
+This is the preferred route when you want Cancer Care Companion available as a reusable Skill inside Claude chat rather than only inside one Project.
 
-You can use more than one setup. For example, a caregiver might maintain the case in a persistent Claude Project while a clinical team uses the ChatGPT Work instructions to generate an appointment packet or structured decision artifact.
+Build the uploadable package:
 
-## Option 1: Install as a Claude Skill
-
-Cancer Care Companion is packaged in the Agent Skills format under:
-
-```text
-skills/cancer-care-companion/
+```bash
+python3 scripts/package_claude_skill.py
 ```
 
-Install it from GitHub with:
+This creates:
+
+```text
+dist/cancer-care-companion-claude-skill.zip
+```
+
+Then in Claude:
+
+1. Open **Customize**.
+2. Open **Skills**.
+3. Click **+**.
+4. Choose **Create skill**.
+5. Choose **Upload a skill**.
+6. Upload `cancer-care-companion-claude-skill.zip`.
+7. Enable the Skill.
+
+Full instructions: [`CLAUDE-SKILL-INSTALL.md`](./CLAUDE-SKILL-INSTALL.md)
+
+For Claude Code or other compatible developer environments, the Agent Skills CLI also remains available:
 
 ```bash
 npx skills add DataDrivenMed/cancer-care-companion --skill cancer-care-companion --global --yes
 ```
 
-Then invoke it with natural language, for example:
-
-```text
-/cancer-care My mom was diagnosed with breast cancer last week. We are waiting for HER2 testing and meet the oncologist Friday. Build our living brief and tell us the three things that matter most now.
-```
-
-Full instructions: [`CLAUDE-SKILL-INSTALL.md`](./CLAUDE-SKILL-INSTALL.md)
-
 ## Option 2: Use a Claude Project
 
-The original project-based setup remains available.
+The project-based setup remains available and is useful for one long-running patient case.
 
 1. Create a Claude Project.
 2. Open **Project Instructions**.
-3. Copy [`claude-instructions.md`](./claude-instructions.md) into the project instructions.
-4. Add de-identified case material when needed.
-5. Keep returning to the same project as the case changes.
+3. Copy [`claude-instructions.md`](./claude-instructions.md) into the Project instructions.
+4. Add case material according to the privacy rules of the account being used.
+5. Keep returning to the same Project as the case changes.
 
-This setup is useful when one patient or family wants a persistent workspace containing the evolving case.
+A practical pattern is to use the global **Cancer Care Companion Skill** for behavior and a dedicated **Claude Project** for each persistent case.
 
 ## Option 3: Configure a Custom GPT in ChatGPT
 
-The repository includes a complete Custom GPT configuration with:
-
-- GPT name
-- description
-- full Instructions text
-- recommended Knowledge files
-- recommended capabilities
-- conversation starters
-- a synthetic test case
-
-Use:
+The repository includes a complete ChatGPT Custom GPT setup:
 
 [`chatgpt-gpt-setup.md`](./chatgpt-gpt-setup.md)
 
-The GPT can then be used without requiring the user to remember command syntax. Example:
+The GPT configuration is split correctly into separate layers:
 
 ```text
-I uploaded the pathology, CT report, and molecular testing. Build the longitudinal case and tell me what the next decision is.
+chatgpt/
+  INSTRUCTIONS.md
+  KNOWLEDGE_MANIFEST.md
+  actions/
+    clinicaltrials-openapi.yaml
 ```
 
-**Availability note:** ChatGPT controls who can create new Custom GPTs based on workspace type and permissions. If your ChatGPT environment does not provide the GPT builder, use the ChatGPT Work setup below or a ChatGPT Project.
+- `chatgpt/INSTRUCTIONS.md` defines how the GPT behaves.
+- `chatgpt/KNOWLEDGE_MANIFEST.md` lists reusable reference files to upload as GPT Knowledge.
+- `clinicaltrials-openapi.yaml` is an optional Action for the public ClinicalTrials.gov API v2.
+
+The setup guide also includes the GPT name, description, conversation starters, recommended capabilities, testing scenarios, and privacy boundaries.
+
+**Current availability note:** OpenAI currently limits creation of new Custom GPTs to eligible Business, Enterprise, and Edu workspaces, subject to workspace permissions. If the GPT builder is unavailable, the same instructions can be used in a ChatGPT Project.
 
 ## Option 4: Use with ChatGPT Work
 
-The repository includes a dedicated instruction set designed for ChatGPT Work:
+For artifact-oriented workflows, use:
 
 [`chatgpt-work-instructions.md`](./chatgpt-work-instructions.md)
 
-This setup focuses on creating and updating editable artifacts such as:
+This is useful for creating and updating editable files such as:
 
 ```text
 <first-name>-living-brief.md
@@ -107,141 +109,116 @@ This setup focuses on creating and updating editable artifacts such as:
 <first-name>-decision-map.md
 ```
 
-Typical Work request:
+# How Cancer Care Companion works
 
-```text
-Use the attached pathology, CT report, oncology note, and molecular report. Create a concise Living Brief, structured cancer-state file, and Treatment Timeline. Separate confirmed, pending, uncertain, conflicting, and historical information. Preserve source dates.
-```
+The basic workflow is:
 
-When a new result arrives:
-
-```text
-Update the attached Living Brief and cancer-state file using this new PET/CT report. Do not recreate them from scratch. Show exactly what changed and whether the new findings alter the current decision point.
-```
+1. **Start with whatever information you have.** A diagnosis, brain dump, pathology report, imaging report, molecular report, treatment summary, or existing cancer brief is enough.
+2. **Build one longitudinal cancer record.**
+3. **Keep updating the same case whenever something changes.**
+4. **Preserve chronology and source provenance.**
+5. **Generate the view needed for the current task.**
 
 # Your first use
-
-You can start with almost nothing.
 
 ## Start from a brain dump
 
 ```text
-/cancer-care My mom was diagnosed with breast cancer last week. We know it is invasive ductal carcinoma. We are waiting for HER2 testing and meet the oncologist Friday. Build our living brief and tell us what matters next.
+My mom was diagnosed with breast cancer last week. We know it is invasive ductal carcinoma. We are waiting for HER2 testing and meet the oncologist Friday. Build our living brief and tell us what matters next.
 ```
 
 ## Start from uploaded reports
 
-Upload the reports, then type:
-
 ```text
-/cancer-care Read these documents, reconcile the dates and findings, and create our living cancer record. Separate what is confirmed, pending, uncertain, and conflicting. Then give me the three most important next actions.
+Read these documents, reconcile the dates and findings, and create our longitudinal cancer record. Separate confirmed, reported, pending, uncertain, historical, and conflicting information. Then give me the three most important next actions.
 ```
 
 ## Start from an existing `/fuck-cancer` brief
 
 ```text
-/cancer-care Import this existing brief as the starting point. Preserve the concise patient-facing summary, but build the deeper longitudinal cancer state behind it.
+Import this existing brief as the starting point. Preserve the concise patient-facing summary, but build the deeper longitudinal cancer state behind it.
 ```
 
 # The most important rule: keep updating the same case
 
 Cancer Care Companion is designed to be longitudinal. Do not start over every time a new result arrives.
 
-When something changes, return to the same case, workspace, source-of-truth document, or artifacts and update them.
-
 ## New pathology
 
 ```text
-/cancer-care Update our case with this new pathology report. Tell me what changed, what is now confirmed, and whether any previous information conflicts with it.
+Update the existing case with this new pathology report. Tell me what changed, what is now confirmed, and whether any earlier information conflicts with it.
 ```
 
-## New scan
+## New imaging
 
 ```text
-/cancer-care Update the timeline and disease status with this CT report. Compare it with the previous scan and explain the meaningful change in plain English.
+Add this CT report. Compare it with the prior scan and update disease sites, response status, pending questions, and next actions.
 ```
 
-## New molecular or biomarker result
+## New molecular testing
 
 ```text
-/cancer-care biomarkers Add this NGS report to the case. Explain each clinically relevant finding, preserve the specimen and assay information, and tell me which current decisions it could affect.
+Add this molecular report. Organize each finding by specimen, assay, date, result, and potential significance. Show what may be actionable, what is uncertain, and what the oncology team must still confirm.
 ```
 
-## Treatment begins
+## Treatment change
 
 ```text
-/cancer-care Add today's treatment plan to the Treatment Timeline. Keep treatment intent, drugs, schedule, monitoring, and expected decision points separate from anything that is still uncertain.
-```
-
-## After an oncology visit
-
-```text
-/cancer-care Update our record with these visit notes. Show what changed since the last version and update our three priorities.
+The oncologist stopped regimen A and started regimen B today because of progression. Update the Treatment Timeline and explain what this changes in our Living Brief.
 ```
 
 # What can I ask it to do?
 
-You do not need exact commands. Natural language is preferred. These labels are useful shortcuts.
+You do not need exact commands. Natural language is preferred.
 
 | Request | What you get |
 | --- | --- |
-| `/cancer-care` | Build or update the longitudinal cancer record and Living Brief |
-| `/cancer-care appointment` | Appointment Packet with changes, pending results, next decision, and questions |
-| `/cancer-care decision` | Decision Map comparing realistic options and unresolved information |
-| `/cancer-care biomarkers` | Structured explanation of pathology and molecular findings |
-| `/cancer-care treatment` | Treatment Timeline with response, toxicity, and reasons for change |
-| `/cancer-care trials` | Shortlist of plausible trial candidates with site-level status |
-| `/cancer-care second-opinion` | Second-Opinion Packet focused on the question that needs another expert review |
-| `/cancer-care symptoms` | Context-aware symptom organization and escalation support |
-| `/cancer-care appeal` | Structured insurance-denial and appeal support |
-| `/cancer-care caregiver` | Caregiver handoff with immediate logistics and watch items |
-| `/cancer-care survivorship` | Transition the existing record into surveillance and survivorship tracking |
+| **Living Brief** | The shortest useful patient/caregiver summary |
+| **Case Update** | Add a new report, result, visit, symptom, or treatment change |
+| **Appointment Packet** | Changes, pending results, next decision, and up to five high-value questions |
+| **Decision Map** | Comparison of realistic options and unresolved information |
+| **Biomarker Summary** | Structured explanation of pathology and molecular findings |
+| **Treatment Timeline** | Treatment, response, toxicity, and reasons for change |
+| **Trial Shortlist** | Candidate trials with site-level status and eligibility uncertainties |
+| **Second-Opinion Packet** | The exact question and records needed for outside review |
+| **Symptom Support** | Context-aware symptom organization and escalation support |
+| **Insurance Appeal** | Denial, evidence, deadline, and appeal organization |
+| **Caregiver Handoff** | Immediate logistics and watch items for another caregiver |
+| **Survivorship** | Surveillance and late-effect tracking in the same longitudinal record |
 
-# Example workflow from diagnosis forward
+# Example workflow
 
-A case might evolve like this.
-
-### Day 1: diagnosis
-
-```text
-/cancer-care My dad has newly diagnosed lung adenocarcinoma. Here are the biopsy and CT reports. Build the case and tell us the three things that matter now.
-```
-
-Cancer Care Companion establishes the diagnosis, known disease extent, pending workup, immediate milestones, and a Living Brief.
-
-### Day 5: molecular testing arrives
+### Diagnosis
 
 ```text
-/cancer-care biomarkers Add this NGS report. Update the case and tell me what this changes.
+My dad has newly diagnosed lung adenocarcinoma. Here are the biopsy and CT reports. Build the case and tell us the three things that matter now.
 ```
 
-The new results are added without erasing the original pathology. Specimen, assay, date, alteration, and clinical context remain traceable.
-
-### Day 7: oncology appointment
+### Molecular testing arrives
 
 ```text
-/cancer-care appointment Prepare us for tomorrow. What changed, what is still unknown, what decision is likely coming, and what five questions should we ask?
+Add this NGS report to Dad's existing case. Preserve the original pathology and tell me what this changes.
 ```
 
-### Day 8: two options are discussed
+### Appointment preparation
 
 ```text
-/cancer-care decision The oncologist discussed these two treatment approaches. Build a Decision Map comparing them using the facts in our case and current evidence. Do not choose for us.
+Prepare us for tomorrow's oncology appointment. What changed, what is still unknown, what decision is likely coming, and what five questions should we ask?
 ```
 
-### Later: trial screening
+### Treatment decision
 
 ```text
-/cancer-care trials Find plausible trials within 150 miles that fit the diagnosis, stage, biomarker, and treatment setting we have documented. Tell me what the trial sites would still need to confirm.
+The oncologist discussed these two treatment approaches. Build a Decision Map using the information already in the case and current evidence. Do not choose for us.
 ```
 
-### During treatment
+### Trial screening
 
 ```text
-/cancer-care Update the Treatment Timeline with today's infusion and these laboratory results. Note the new symptoms and tell me whether anything warrants contacting the oncology team now.
+Find plausible trials within 150 miles that fit the documented diagnosis, stage, biomarker, and treatment setting. Tell me what the trial sites would still need to confirm.
 ```
 
-The same case continues throughout the course of care.
+This is the intended pattern: **one evolving case, many purpose-built views.**
 
 # Two-layer model
 
@@ -275,45 +252,14 @@ The brief is the front door. The structured cancer state is the engine behind it
 | Trial Navigator | Finds candidate trials, checks site-level recruitment, and screens obvious mismatches without claiming eligibility |
 | Second Opinions | Matches the clinical question to pathology, surgery, radiation, medical oncology, molecular tumor board, genetics, or trial review |
 | Appointment Packet | Summarizes what changed, what is pending, and up to five high-value questions |
-| Symptom Support | Organizes symptoms and uses care-team instructions plus context-aware escalation rather than universal hard-coded rules |
-| Practical Navigation | Organizes insurance, travel, lodging, work, disability, financial support, rehabilitation, nutrition, fertility, and caregiver logistics |
-| Survivorship | Transitions the same longitudinal record into surveillance and late-effect tracking when appropriate |
+| Symptom Support | Uses care-team instructions plus context-aware escalation rather than universal hard-coded rules |
+| Practical Navigation | Organizes insurance, travel, lodging, work, disability, support, rehabilitation, nutrition, fertility, and caregiver logistics |
+| Survivorship | Transitions the same longitudinal record into surveillance and late-effect tracking |
 | Document Intelligence | Keeps extracted facts traceable to pathology, imaging, notes, molecular reports, labs, and other supplied records |
-
-# Output modes
-
-The same underlying case can generate:
-
-- **Living Brief**: shortest patient/caregiver summary
-- **Appointment Packet**: visit preparation and questions
-- **Decision Map**: options, evidence, tradeoffs, and unknowns
-- **Trial Shortlist**: three to five candidate studies with site status
-- **Second-Opinion Packet**: concise case summary plus exact review question
-- **Treatment Timeline**: chronological therapy, response, and toxicity history
-- **Biomarker Summary**: molecular findings with specimen, assay, date, and provenance
-- **Caregiver Handoff**: immediate logistics and watch items
-- **Survivorship Update**: surveillance and late-effect tracking
 
 # Structured cancer state
 
-The included JSON schema supports:
-
-- cancer type and histology
-- staging system, stage, and basis
-- disease sites
-- pathology
-- biomarkers and molecular alterations
-- germline results
-- treatments and line or intent when documented
-- response assessments
-- symptoms and adverse effects
-- pending studies
-- decision points
-- appointments
-- clinical-trial candidates
-- practical barriers
-- source-document provenance
-- contradictions and unresolved conflicts
+The JSON schema supports diagnosis, stage, disease sites, pathology, biomarkers, germline results, treatments, response, symptoms, pending studies, decision points, appointments, trial candidates, practical barriers, source provenance, and unresolved conflicts.
 
 A newer result never silently erases an older one. Conflicting records are surfaced for clarification.
 
@@ -326,29 +272,23 @@ For current medical research, prefer:
 3. current official professional guidance when directly applicable
 4. peer-reviewed primary evidence for unresolved or emerging questions
 5. academic cancer-center pages for their own programs and trials
-6. curated variant resources only as supplemental evidence
+6. curated molecular resources only as supplemental evidence
 
-Do not present search snippets, SEO pages, social posts, or AI summaries as medical evidence.
+Do not present search snippets, SEO health pages, social posts, or AI summaries as medical evidence.
 
 # Symptom escalation
 
-Cancer Care Companion does not use one universal oncology triage table for every patient. Escalation should consider:
+Cancer Care Companion does not use one universal oncology triage table for every patient. Escalation should consider the oncology team's instructions, treatment type and timing, documented risk factors, measured vital signs when available, severity and progression, hydration, medication access, and neurologic, respiratory, bleeding, allergic, or other emergency features.
 
-- the oncology team's written instructions
-- treatment type and timing
-- immune suppression or other documented risk factors
-- measured vital signs when available
-- severity, duration, and progression
-- inability to hydrate or take essential medication
-- neurologic, respiratory, bleeding, or other emergency features
-
-When urgent evaluation is the safest action, that action comes first and research does not delay it.
+When urgent evaluation may be needed, the immediate action comes first and research does not delay it.
 
 # Privacy
 
-Use the privacy rules of the environment in which Cancer Care Companion is running. Do not place names, medical record numbers, dates of birth, exact addresses, or other direct identifiers into public web searches or trial-search queries.
+Use the privacy rules of the environment in which Cancer Care Companion is running.
 
-For consumer AI services, review the service's data controls and organizational policies before entering protected or confidential health information. Do not assume that all AI environments have the same privacy, retention, or compliance configuration.
+Do not place names, medical record numbers, dates of birth, exact addresses, insurance identifiers, or other direct identifiers into public web searches or clinical-trial queries.
+
+Do not put a real patient's private case record into reusable shared GPT Knowledge files or a shared Claude Skill package.
 
 # Repository layout
 
@@ -360,12 +300,28 @@ skills/cancer-care-companion/
     openai.yaml
   scripts/
     search_trials.py
+
 schemas/
   cancer-state.schema.json
+
 templates/
   living-brief.md
   appointment-packet.md
   decision-map.md
+
+chatgpt/
+  INSTRUCTIONS.md
+  KNOWLEDGE_MANIFEST.md
+  actions/
+    clinicaltrials-openapi.yaml
+
+scripts/
+  package_claude_skill.py
+
+.github/workflows/
+  test.yml
+  package-claude-skill.yml
+
 CLAUDE-SKILL-INSTALL.md
 claude-instructions.md
 chatgpt-gpt-setup.md

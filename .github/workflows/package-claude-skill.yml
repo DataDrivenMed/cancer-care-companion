@@ -1,4 +1,4 @@
-name: package-claude-skill
+name: package-claude-skills
 
 on:
   workflow_dispatch:
@@ -6,9 +6,13 @@ on:
     branches: [main]
     paths:
       - "skills/cancer-care-companion/**"
+      - "skills/cancer-care-companion-patient/**"
+      - "skills/cancer-care-companion-power/**"
       - "schemas/**"
       - "templates/**"
       - "DISCLAIMER.md"
+      - "QUICKSTART.md"
+      - "CLAUDE-SKILL-INSTALL.md"
       - "scripts/package_claude_skill.py"
       - ".github/workflows/package-claude-skill.yml"
 
@@ -22,12 +26,24 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Build Claude Skill ZIP
+      - name: Build Claude Skill ZIPs
         run: python3 scripts/package_claude_skill.py
 
-      - name: Upload Claude Skill package
+      - name: Verify packages
+        run: |
+          test -s dist/cancer-care-companion-claude-skill.zip
+          test -s dist/cancer-care-companion-patient-claude-skill.zip
+          test -s dist/cancer-care-companion-power-claude-skill.zip
+          unzip -t dist/cancer-care-companion-claude-skill.zip
+          unzip -t dist/cancer-care-companion-patient-claude-skill.zip
+          unzip -t dist/cancer-care-companion-power-claude-skill.zip
+
+      - name: Upload Claude Skill packages
         uses: actions/upload-artifact@v4
         with:
-          name: cancer-care-companion-claude-skill
-          path: dist/cancer-care-companion-claude-skill.zip
+          name: cancer-care-companion-claude-skills
+          path: |
+            dist/cancer-care-companion-claude-skill.zip
+            dist/cancer-care-companion-patient-claude-skill.zip
+            dist/cancer-care-companion-power-claude-skill.zip
           if-no-files-found: error

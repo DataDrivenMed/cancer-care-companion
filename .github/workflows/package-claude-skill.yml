@@ -1,0 +1,33 @@
+name: package-claude-skill
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "skills/cancer-care-companion/**"
+      - "schemas/**"
+      - "templates/**"
+      - "DISCLAIMER.md"
+      - "scripts/package_claude_skill.py"
+      - ".github/workflows/package-claude-skill.yml"
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build Claude Skill ZIP
+        run: python3 scripts/package_claude_skill.py
+
+      - name: Upload Claude Skill package
+        uses: actions/upload-artifact@v4
+        with:
+          name: cancer-care-companion-claude-skill
+          path: dist/cancer-care-companion-claude-skill.zip
+          if-no-files-found: error
